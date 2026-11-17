@@ -5,7 +5,7 @@
   "codes": {
     "proposal": "ISO 3166-2:FR codes: FR-ARA to FR-PAC and FR-20R for metropolitan France; FR-971, FR-972, FR-973, FR-974, FR-976 overseas.",
     "why": "A bare FR is not a US code, but the parts after the hyphen are three letters, three digits or 20R, while address index ids must match [A-Z]{2} (engine/setup/manifest.py line 72, engine/setup/install.py line 267). None of them is in STATE_CODES (engine/address_search.py). Départements have numeric codes (FR-14, FR-2A).",
-    "verified": "Not checked against the ISO site, which asks visitors to accept its terms. Read from Wikipedia's ISO 3166-2:FR page on 2026-11-17 (secondary source)."
+    "verified": "Read from Wikipedia's ISO 3166-2:FR page on 2026-11-17 (secondary source). Then checked on ISO's Online Browsing Platform (entry FR), opened in a browser after accepting its terms: all 18 codes are in its list; its change history dates FR-COR to FR-20R to 2020-11-24 and the deletion of FR-GP, FR-MQ, FR-GF, FR-RE and FR-YT to 2021-11-25; FR-971, FR-974 and FR-976 are filed as \"overseas departmental collectivity\", FR-972 and FR-973 as \"overseas unique territorial collectivity\" (second check)."
   },
   "layer_keys": {
     "terrain": "terrain.sqlite",
@@ -127,7 +127,7 @@
         "licence": "Licence-Ouverte-2.0",
         "verified": "2026-11-17",
         "role": "primary",
-        "notes": "WFS ObstEcoul_FXX, filterable by CdDepartement. River obstacles, not a reservoir inventory: no storage and almost no structure heights. Meaning of CdTypeOuvrage codes not checked. Overseas coverage not checked (the layer name says FXX)."
+        "notes": "WFS ObstEcoul_FXX, filterable by CdDepartement. River obstacles, not a reservoir inventory: no storage and almost no structure heights. Meaning of CdTypeOuvrage codes not checked. Overseas: Sandre's WFS has ObstEcoul_GLP, _MTQ, _GUF, _REU, _MYT and _all beside _FXX; counts on 2026-11-17 (resultType=hits): 120,038 metropolitan, 113 Guadeloupe, 388 Martinique, 741 Guyane, 140 La Réunion, 156 Mayotte, 125,818 in all (second check, measured)."
       }
     ],
     "crops": [
@@ -158,7 +158,7 @@
         "licence": "Licence-Ouverte-2.0",
         "verified": "2026-11-17",
         "role": "primary",
-        "notes": "Footprints with height in metres. Edition 2026-09-15 is listed for each of the 101 départements in the download feed. Tried for 14, 50 and 61: height for 97.9 % of 1,539,916 buildings."
+        "notes": "Footprints with height in metres. Edition 2026-09-15 is listed for each of the 101 départements in the download feed. Tried for 14, 50 and 61: height for 97.9 % of 1,539,916 buildings. hauteur runs from the lowest ground point to the top of the eaves (the roof edge, or the top of the wall under a flat roof), not to the ridge (BD TOPO 3.5 content description, July 2026; second check)."
       },
       {
         "dataset": "Global ML Building Footprints",
@@ -215,7 +215,7 @@
         "licence": "Licence-Ouverte-2.0",
         "verified": "2026-11-17",
         "role": "alternative",
-        "notes": "country = FR, 26,052,116 rows; the same BAN, about a month older. Shape of address_levels, postal_city and number for French rows not checked; whether overseas rows are filed under FR not checked."
+        "notes": "country = FR, 26,052,116 rows; the same BAN, about a month older. Release 2026-10-21.0 (second check, measured with DuckDB): every FR row has a five-digit postcode; postal_city is empty in every row and address_levels has one entry, the commune, so tools/build_addresses.py as written would store an empty city and the commune's first two letters as the state (351 values, 6,894,553 rows or 26 % equal to a real US code); 7.8 % of numbers carry a suffix, mostly fused (\"12bis\"); sources[0].dataset names the département (fr/59, fr/2A), an exact cut without postcodes. The five overseas regions are under FR, as are Saint-Barthélemy, Saint-Martin and Saint-Pierre-et-Miquelon; no rows under GP, MQ, GF, RE or YT."
       }
     ],
     "pois": [
@@ -226,7 +226,7 @@
         "licence": "ODbL-1.0",
         "verified": "2026-11-17",
         "role": "primary",
-        "counts_as_of": "trial area only; national counts not checked",
+        "counts_as_of": "trial area only; metropolitan counts in counts_metropolitan_france",
         "counts": {
           "hospital": 73,
           "pharmacy": 397,
@@ -236,7 +236,26 @@
           "police": 176,
           "shelter": 983,
           "drinking_water": 348
+        },
+        "counts_metropolitan_france_as_of": "taginfo for Geofabrik's metropolitan France extract, data until 2026-11-16 21:22 UTC, all object types (second check)",
+        "counts_metropolitan_france": {
+          "pharmacy": 19141,
+          "fire_station": 6124,
+          "police": 5979,
+          "hospital": 2494,
+          "drinking_water": 26740,
+          "defibrillator": 28328,
+          "fire_hydrant": 246264
         }
+      },
+      {
+        "dataset": "BD TOPO® v3.5, zone_d_activite_ou_d_interet layer",
+        "publisher": "IGN",
+        "url": "https://data.geopf.fr/wfs/ows",
+        "licence": "Licence-Ouverte-2.0",
+        "verified": "2026-11-17 (second check, measured: WFS counts)",
+        "role": "official source (fire stations, gendarmerie, police, mountain refuges)",
+        "notes": "With geometry, overseas included, same licence as the buildings. Caserne de pompiers 6,710; Gendarmerie 3,775; police entries 960; Refuge 718; Abri de montagne 1,854."
       },
       {
         "dataset": "Géo'DAE, national defibrillator base",
@@ -288,7 +307,7 @@
     "NF Z 10-011 addressing standard (AFNOR, sold; read only through La Poste's specification)",
     "BSS EAU water points (BRGM): licence \"not specified\" on data.gouv.fr",
     "BNPE abstraction works (Hub'Eau): points at the commune centroid or of unknown precision; licence not checked",
-    "A national list of fire stations: none found (Calvados publishes its own)",
+    "A national list of fire stations: none found (Calvados publishes its own); BD TOPO's zone_d_activite_ou_d_interet holds 6,710 fire and rescue centres under Licence Ouverte 2.0, see pois (second check, measured)",
     "A national list of public drinking water points, shelters or SAIP sirens: none found"
   ],
   "addressing": {
@@ -318,7 +337,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/84/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           1.91,
@@ -397,7 +416,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/27/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           2.69,
@@ -472,7 +491,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/53/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -5.3,
@@ -536,7 +555,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/24/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -0.1,
@@ -602,7 +621,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/94/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           8.38,
@@ -664,7 +683,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/44/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           3.23,
@@ -748,7 +767,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/32/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           1.23,
@@ -820,7 +839,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/11/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           1.29,
@@ -888,7 +907,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/28/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -2.11,
@@ -960,7 +979,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/75/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -1.95,
@@ -1046,7 +1065,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/76/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -0.48,
@@ -1126,7 +1145,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/52/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -2.78,
@@ -1191,7 +1210,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/93/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           4.08,
@@ -1257,7 +1276,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/01/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -61.96,
@@ -1296,8 +1315,8 @@
         "bulk": "Geofabrik extracts as listed; IGN products per département or region through https://data.geopf.fr/telechargement/resource/<product>",
         "url": "https://geo.api.gouv.fr/regions/01",
         "verified": "2026-11-17; IGN and BAN files seen in the download feeds and by HEAD only, not tried",
-        "overture_addresses_licence": "not checked: whether Overture files these rows under FR or under GP, MQ, GF, RE, YT",
-        "notes": "Small neighbouring islands (Dominica, Montserrat) are not in the Natural Earth 1:110m outlines; overlap not checked. Saint-Barthélemy and Saint-Martin are not part of this region but use 971xx postcodes. Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage."
+        "overture_addresses_licence": "Licence-Ouverte-2.0: Overture files these rows under FR, with no rows under GP, MQ, GF, RE or YT (second check, measured)",
+        "notes": "Small neighbouring islands (Dominica, Montserrat) are not in the Natural Earth 1:110m outlines; overlap not checked. Saint-Barthélemy and Saint-Martin are not part of this region but use 971xx postcodes. They lie outside the box: BD TOPO's collectivite_territoriale layer puts Saint-Barthélemy at 62.93° to 62.79° W, 17.87° to 17.97° N and Saint-Martin at 63.15° to 62.97° W, 18.05° to 18.13° N, at least 1.2° north and 0.8° west of the padded box, so a Guadeloupe map would not show their streets (second check, measured). Coverage: MNT LiDAR HD planned; BD TOPAGE 2026 and INPE 2023 present; no OSO; CORINE Land Cover 2012 (second check). Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage."
       }
     },
     {
@@ -1318,7 +1337,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/02/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -61.38,
@@ -1357,8 +1376,8 @@
         "bulk": "Geofabrik extracts as listed; IGN products per département or region through https://data.geopf.fr/telechargement/resource/<product>",
         "url": "https://geo.api.gouv.fr/regions/02",
         "verified": "2026-11-17; IGN and BAN files seen in the download feeds and by HEAD only, not tried",
-        "overture_addresses_licence": "not checked: whether Overture files these rows under FR or under GP, MQ, GF, RE, YT",
-        "notes": "Small neighbouring islands (Dominica, Saint Lucia) are not in the Natural Earth 1:110m outlines; overlap not checked. Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage."
+        "overture_addresses_licence": "Licence-Ouverte-2.0: Overture files these rows under FR, with no rows under GP, MQ, GF, RE or YT (second check, measured)",
+        "notes": "Small neighbouring islands (Dominica, Saint Lucia) are not in the Natural Earth 1:110m outlines; overlap not checked. Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage. Coverage: MNT LiDAR HD planned; BD TOPAGE 2026 and INPE 2023 present; no OSO; CORINE Land Cover 2012 (second check)."
       }
     },
     {
@@ -1379,7 +1398,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/03/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           -54.76,
@@ -1418,8 +1437,8 @@
         "bulk": "Geofabrik extracts as listed; IGN products per département or region through https://data.geopf.fr/telechargement/resource/<product>",
         "url": "https://geo.api.gouv.fr/regions/03",
         "verified": "2026-11-17; IGN and BAN files seen in the download feeds and by HEAD only, not tried",
-        "overture_addresses_licence": "not checked: whether Overture files these rows under FR or under GP, MQ, GF, RE, YT",
-        "notes": "The box covers parts of Suriname and Brazil (Natural Earth 1:110m test)."
+        "overture_addresses_licence": "Licence-Ouverte-2.0: Overture files these rows under FR, with no rows under GP, MQ, GF, RE or YT (second check, measured)",
+        "notes": "The box covers parts of Suriname and Brazil (Natural Earth 1:110m test). Coverage: MNT LiDAR HD excludes Guyane; INPE 2023 has no Guyane file (its record says \"in progress\"); BD TOPAGE 2026 not found for Guyane, from the State catalogue's listing and two guessed file names that returned 404, which is not proof; no OSO; CORINE Land Cover 2012 (second check)."
       }
     },
     {
@@ -1440,7 +1459,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/04/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           55.06,
@@ -1479,8 +1498,8 @@
         "bulk": "Geofabrik extracts as listed; IGN products per département or region through https://data.geopf.fr/telechargement/resource/<product>",
         "url": "https://geo.api.gouv.fr/regions/04",
         "verified": "2026-11-17; IGN and BAN files seen in the download feeds and by HEAD only, not tried",
-        "overture_addresses_licence": "not checked: whether Overture files these rows under FR or under GP, MQ, GF, RE, YT",
-        "notes": "No other land within the padded box in the Natural Earth 1:110m outlines; small islands not checked. Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage."
+        "overture_addresses_licence": "Licence-Ouverte-2.0: Overture files these rows under FR, with no rows under GP, MQ, GF, RE or YT (second check, measured)",
+        "notes": "No other land within the padded box in the Natural Earth 1:110m outlines; small islands not checked. Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage. Coverage: MNT LiDAR HD planned; BD TOPAGE 2026 and INPE 2023 present; no OSO; CORINE Land Cover 2012 (second check)."
       }
     },
     {
@@ -1501,7 +1520,7 @@
           "publisher": "geo.api.gouv.fr (French State API)",
           "licence": null,
           "url": "https://geo.api.gouv.fr/regions/06/departements",
-          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read"
+          "verified": "2026-11-17; simplified outlines: for départements 14, 50 and 61 the north edge falls about 270 m short of IGN ADMIN EXPRESS COG 2026, the other three edges agree; the source and licence of the outlines are not stated on the API page read. Boxes computed from every vertex of IGN's WFS layer ADMINEXPRESS-COG.2026:region agree with this one to 0.0001°, and the padded box is identical (second check, measured); IGN's ADMIN EXPRESS page on cartes.gouv.fr names etalab-2.0 and fixes no credit sentence (second check)"
         },
         "padded_0_15": [
           44.86,
@@ -1540,8 +1559,8 @@
         "bulk": "Geofabrik extracts as listed; IGN products per département or region through https://data.geopf.fr/telechargement/resource/<product>",
         "url": "https://geo.api.gouv.fr/regions/06",
         "verified": "2026-11-17; IGN and BAN files seen in the download feeds and by HEAD only, not tried",
-        "overture_addresses_licence": "not checked: whether Overture files these rows under FR or under GP, MQ, GF, RE, YT",
-        "notes": "INSEE's population de référence 2023 tables cover France excluding Mayotte. Overlap with the Comoros not checked (not in the Natural Earth 1:110m outlines). Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage."
+        "overture_addresses_licence": "Licence-Ouverte-2.0: Overture files these rows under FR, with no rows under GP, MQ, GF, RE or YT (second check, measured)",
+        "notes": "INSEE's population de référence 2023 tables cover France excluding Mayotte. Overlap with the Comoros not checked (not in the Natural Earth 1:110m outlines). Geofabrik offers no free GeoPackage or shapefile for this region (\"not available for this region\"); tools/build_map.py reads the free GeoPackage. Coverage: MNT LiDAR HD planned; BD TOPAGE 2026 and INPE 2023 present; no OSO; CORINE Land Cover 2012 (second check)."
       }
     }
   ]

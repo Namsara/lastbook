@@ -21,6 +21,10 @@ carries one of three marks:
 - **not checked**: the page could not be reached or read, or the question was not looked at; the row says what is
   missing.
 
+A second contributor checked several points first listed as gaps, the same day and with the same kind of AI research
+agents plus their own review. Those facts carry the mark **second check**, with **measured** where a query or script
+was run.
+
 ## Why France is a different case
 
 Germany's layers come from 16 state agencies under four licences. In France most layers have one national source under
@@ -44,8 +48,10 @@ State's geography API list all 18 as regions (opened), and so does this proposal
 ISO 3166-2:FR gives the metropolitan regions three letters after `FR-` (`FR-ARA`, `FR-NOR` and so on), Corsica `FR-20R`,
 and the overseas units three digits (`FR-971` Guadeloupe, `FR-972` Martinique, `FR-973` Guyane, `FR-974` La Réunion,
 `FR-976` Mayotte). Départements have their own codes, such as `FR-14`, `FR-2A` and `FR-2B` (Paris is `FR-75C`). These
-were read from Wikipedia's copy of ISO 3166-2:FR (opened); they were not checked against the ISO site, which asks
-visitors to accept its terms first, as REGIONS.md and REGIONS-DE.md also note for their codes.
+were read from Wikipedia's copy of ISO 3166-2:FR (opened), then checked on ISO's Online Browsing Platform (entry `FR`),
+opened in a browser after accepting its terms: all 18 codes are in its list. ISO files `FR-971`, `FR-974` and `FR-976`
+as "overseas departmental collectivity", and `FR-972` and `FR-973` as "overseas unique territorial collectivity"
+(second check).
 
 - **A bare `FR` is safe; the part after the hyphen is the problem.** No part is two letters: `ARA` is three letters,
   `971` three digits, `20R` mixed. The engine accepts an address index only under a two-letter name:
@@ -53,7 +59,9 @@ visitors to accept its terms first, as REGIONS.md and REGIONS-DE.md also note fo
   cannot get address indexes under their ISO codes without a change to that rule.
 - **No collision with US codes.** None of the 18 parts is in `STATE_CODES` (`engine/address_search.py`). The two-letter
   ISO 3166-1 codes of the overseas regions (`GP`, `MQ`, `GF`, `RE`, `YT`) are not in it either. Wikipedia's change
-  history says ISO deleted `FR-GP`, `FR-MQ`, `FR-GF`, `FR-RE` and `FR-YT` as French subdivisions in 2021.
+  history says ISO deleted `FR-GP`, `FR-MQ`, `FR-GF`, `FR-RE` and `FR-YT` as French subdivisions in 2021. ISO's own
+  change history dates that deletion to 25 November 2021, and the change from `FR-COR` to `FR-20R` to 24 November 2020
+  (second check).
 - **The trial used a provisional stem.** To pass the `[A-Z]{2}` rule, the trial index was named with a two-letter code
   that is not an ISO code (`BN`). It is not proposed. The trial builder refuses a region code that equals a US state
   code, because the engine reads any `XX.sqlite` named like a state with US rules, without opening its `meta` table.
@@ -75,8 +83,12 @@ was then widened by 0.15° and rounded outward to 0.01°, the margin `map_sets.s
 The limit of the method: the API's outlines are simplified, and its page does not state their source or licence. For
 Calvados, Manche and Orne the API's north edge is 49.7276°, about 270 m south of IGN's ADMIN EXPRESS COG 2026
 (49.7300°); west, south and east agree. For the whole of Normandy the box equals the ADMIN EXPRESS box to four decimals,
-because the north edge then falls in Seine-Maritime. Before a build, the boxes should be recomputed from ADMIN EXPRESS
-(IGN; Licence Ouverte 2.0 on its data.gouv.fr record), as the trial did.
+because the north edge then falls in Seine-Maritime. Boxes recomputed from ADMIN EXPRESS (IGN; Licence Ouverte 2.0 on
+its data.gouv.fr record), as the trial did, agree: computed from every vertex of IGN's WFS layer
+`ADMINEXPRESS-COG.2026:region`, they match the boxes below to 0.0001° for all 18 regions, and the boxes with the 0.15°
+margin are identical (second check, measured). IGN's own page for ADMIN EXPRESS on cartes.gouv.fr names `etalab-2.0`
+and links the Licence Ouverte text; neither that page nor the site's terms of use fixes a credit sentence (second
+check).
 
 | Code | INSEE region code | Name | Départements | Box (west, south, east, north) | Box with 0.15° margin |
 |---|---|---|---|---|---|
@@ -114,6 +126,10 @@ and Luxembourg, which carry a buffer:
   out (checked on the `basse-normandie` outline), but a source cut by box would not.
 - Small islands near Guadeloupe, Martinique and Mayotte (Dominica, Saint Lucia, Montserrat, the Comoros) are not in the
   1:110m outlines; whether the boxes reach them was not checked.
+- **Saint-Martin and Saint-Barthélemy** use `971` postcodes (see "Codes") but lie outside Guadeloupe's box: IGN's BD
+  TOPO layer `collectivite_territoriale` puts Saint-Barthélemy at 62.93° to 62.79° W, 17.87° to 17.97° N and
+  Saint-Martin at 63.15° to 62.97° W, 18.05° to 18.13° N, at least 1.2° north and 0.8° west of the padded box (second
+  check, measured). A Guadeloupe map would not show their streets.
 
 The trial's fix: cut by département outlines, and keep the box for display and the spatial index. No region's box
 contains another's (unlike Berlin in Brandenburg in REGIONS-DE.md), but neighbouring boxes overlap widely.
@@ -202,8 +218,26 @@ opened) list a BD ALTI 25 m file and a BD TOPO file of 15 September 2026 for eve
 RPG 2025 file for every one of the 18 regions; the BAN has a CSV for 971 to 976, 2A and 2B (HEAD). None of these was
 tried outside the trial. Overseas files use local projections and height datums (for example UTM 20 with GUAD88 heights
 for Guadeloupe, UTM 40 South with REUN89 for La Réunion), and Corsica's BD ALTI uses IGN78C heights, so the trial's
-Lambert-93 conversion does not apply as it is. The ROE layer is named for metropolitan France (`ObstEcoul_FXX`); its
-overseas coverage, and the rest of the overseas layers (OSM coverage, Overture rows), were not checked.
+Lambert-93 conversion does not apply as it is. The ROE layer is named for metropolitan France (`ObstEcoul_FXX`), but
+Sandre's WFS has one layer per territory beside it, `_GLP`, `_MTQ`, `_GUF`, `_REU` and `_MYT`, and `_all`. Counts on 17
+November (`resultType=hits`): 120,038 in metropolitan France, 113 in Guadeloupe, 388 in Martinique, 741 in Guyane, 140
+in La Réunion, 156 in Mayotte, 125,818 in all (second check, measured). Overture files the overseas rows under `FR`
+(see "How addresses are written"). OSM coverage overseas was not checked.
+
+Coverage of the five overseas regions differs by dataset (second check; opened unless marked):
+
+| Dataset | Metropolitan France | 971 | 972 | 973 Guyane | 974 | 976 |
+|---|---|---|---|---|---|---|
+| BD ALTI, BD TOPO, RPG 2025 (as above); RGE ALTI, cadastre; ROE, Overture addresses (measured) | yes | yes | yes | yes | yes | yes |
+| MNT LiDAR HD | planned "by 2026", progress not read | planned | planned | **excluded** | planned | planned |
+| Copernicus GLO-30 | sample tiles | sample tile | sample tile | sample tiles | sample tile | sample tile |
+| BD TOPAGE 2026, INPE 2023 | yes | yes | yes | **no** (INPE), **not found** (TOPAGE) | yes | yes |
+| OSO (crops) | yes, Corsica included | no | no | no | no | no |
+| CORINE Land Cover | 2018 | 2012 | 2012 | 2012 | 2012 | 2012 |
+| GeoNames postcode files | `FR.zip`, without 971 to 976 | `GP.zip` | `MQ.zip` | `GF.zip` | `RE.zip` | `YT.zip` |
+
+TOPAGE's absence in Guyane rests on the State catalogue's listing and two guessed file names that returned 404 (not
+proof); INPE's record says Guyane is "in progress".
 
 Notes:
 
@@ -216,6 +250,8 @@ Notes:
 - **Crops.** The RPG is declared by farmers, so areas are exact sums rather than satellite pixels. It has no code for
   apple trees: cider orchards most likely fall under `VRG` ("other orchard"), which the data does not confirm, and
   orchards grazed as grassland can be declared as grassland.
+- **Buildings.** BD TOPO's `hauteur` runs from the lowest ground point to the top of the eaves (the roof edge, or the
+  top of the wall under a flat roof), not to the ridge (BD TOPO 3.5 content description, July 2026; second check).
 - **Places.** `places.sqlite` has no population column; the trial put population, postcode and INSEE code in `detail`.
 - **Points of interest.** Geofabrik puts `fuel` in its `traffic` tables, which `tools/build_map.py` does not read, so a
   map built by that tool has no fuel stations; this also affects US maps built with it. `chemist` (a shop selling
@@ -228,9 +264,17 @@ OpenStreetMap stays the base. Several national lists under Licence Ouverte add w
 data.gouv.fr's tabular API): Géo'DAE, the national defibrillator base (192,233 records); the gendarmerie units that
 receive the public, with opening hours (3,681); fuel stations with live prices and shortages (9,833); the education
 directory (68,555 entries). FINESS lists hospitals, clinics and pharmacies, but its counts were not obtained. No
-national list was found for fire stations, public drinking water, shelters, harbours, SAIP sirens or sea rescue
-stations; their absence is not proven. France's emergency numbers include 112, 15, 17, 18, 114 and 196 for rescue at sea
-(service-public.gouv.fr, opened).
+national list was found for public drinking water, shelters, harbours, SAIP sirens or sea rescue stations; their absence
+is not proven. IGN's BD TOPO is an official source for fire stations and more: its `zone_d_activite_ou_d_interet` layer
+holds 6,710 fire and rescue centres, 3,775 gendarmerie posts, 960 police entries, 718 mountain refuges and 1,854
+mountain shelters, with geometry, overseas included, under the same licence as the buildings (WFS counts; second check,
+measured). France's emergency numbers include 112, 15, 17, 18, 114 and 196 for rescue at sea (service-public.gouv.fr,
+opened).
+
+OSM counts for all of metropolitan France (taginfo for Geofabrik's extract, data until 2026-11-16 21:22 UTC, all object
+types; second check): `amenity=pharmacy` 19,141; `amenity=fire_station` 6,124; `amenity=police` 5,979;
+`amenity=hospital` 2,494; `amenity=drinking_water` 26,740; `emergency=defibrillator` 28,328; `emergency=fire_hydrant`
+246,264.
 
 ## Licence notes and attribution
 
@@ -266,6 +310,13 @@ the ODbL; one file or table per licence avoids that (a question, not legal advic
   and `0-9`, so "Église" becomes `glise`; `_parts()` reads the postcode only as the last word, while it comes before the
   commune in France; a last word equal to a state code is taken for a US state, which removes Bellême (`me`), Ri and
   Bonnœil (`il`) among ten communes of the trial area; `tools/build_addresses.py` keeps only `country = 'US'`.
+- **Overture's French rows** (second check, measured with DuckDB on release 2026-10-21.0). There are 26,052,116 rows
+  with `country = 'FR'`, all with a five-digit postcode. `postal_city` is empty in every row, and `address_levels` has
+  one entry, the commune. So `tools/build_addresses.py` as written would store an empty city and the commune's first two
+  letters as the state: 351 values, with 6,894,553 rows (26 %) equal to a real US code. 7.8 % of numbers carry a
+  suffix, mostly fused ("12bis"). `sources[0].dataset` names the département (`fr/59`, `fr/2A`), which gives an exact
+  cut without postcodes. The five overseas regions are under `FR`, and so are Saint-Barthélemy, Saint-Martin and
+  Saint-Pierre-et-Miquelon; there are no rows under `GP`, `MQ`, `GF`, `RE` or `YT`.
 
 ## What a trial build showed
 
@@ -321,10 +372,10 @@ Each of these needs the maintainers' decision before any code changes.
 2. **The box and the cut.** Whether boxes come from ADMIN EXPRESS, and whether every source is cut by département
    outlines rather than by the box, as Jersey and the borders above require.
 3. **Address indexes.** The BAN directly (daily, with repetition index and former commune) or the BAN through Overture
-   (the US pipeline, French fields not checked); one shared `meta` key for the spelling rule (`country = 'FR'` here,
-   `norm = de-1` in #79); the delegated commune in `city` in brackets or in a new column; extra rows for named
-   localities; whether a numbered query with no address should fall back to place search; and whether US indexes should
-   fold accents too, which means rebuilding them.
+   (the US pipeline; French fields in "How addresses are written", second check); one shared `meta` key for the
+   spelling rule (`country = 'FR'` here, `norm = de-1` in #79); the delegated commune in `city` in brackets or in a new
+   column; extra rows for named localities; whether a numbered query with no address should fall back to place search;
+   and whether US indexes should fold accents too, which means rebuilding them.
 4. **Licences in one file.** One table or file per licence, or OSM and Licence Ouverte points merged under the ODbL; an
    answer to ODbL article 4.6; per-region credits with dates.
 5. **Units.** Metric columns (`height_m`, `area_ha`) in the common format, or imperial columns converted on display.
@@ -340,11 +391,9 @@ Each of these needs the maintainers' decision before any code changes.
 
 ## Known gaps
 
-- Not checked: the ISO codes on the ISO site; the source and licence of geo.api.gouv.fr's outlines; Mayotte's
-  population; whether the boxes reach small islands near Guadeloupe, Martinique and Mayotte; how Overture fills
-  `address_levels`, `postal_city` and `number` for French rows, and whether it files overseas rows under `FR`; OSM
-  counts per kind outside the trial area; FINESS counts; the meaning of the ROE's `CdTypeOuvrage` codes; the vertical
-  precision and overseas datums of BD ALTI; whether cider orchards are coded `VRG`; the texts of Licence Ouverte 1.0 and
-  of NF Z 10-011; the licence of BD CARTO, and that of ADMIN EXPRESS beyond its data.gouv.fr record; every layer for
-  Corsica and overseas beyond the presence of the files.
+- Not checked: the source and licence of geo.api.gouv.fr's outlines; Mayotte's population; whether the boxes reach small
+  islands near Guadeloupe, Martinique and Mayotte; FINESS counts; the meaning of the ROE's `CdTypeOuvrage` codes; the
+  vertical precision and overseas datums of BD ALTI; whether cider orchards are coded `VRG`; the texts of Licence
+  Ouverte 1.0 and of NF Z 10-011; the licence of BD CARTO; every layer for Corsica and overseas beyond the presence of
+  the files.
 - The trial covered three départements of one region. Nothing was built for the other 98, for Corsica or overseas.
